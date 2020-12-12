@@ -1,13 +1,27 @@
 from . import db
 from werkzeug.security import generate_password_hash,check_password_hash
+from flask_login import UserMixing, current_user
 from . import login_manager
+from datetime import datetime
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class User(db.Model):
+class Quote:
+    '''
+    Quote class to define quote Objects
+    '''
+
+    def __init__(self,id,author,quote):
+        self.id =id
+        self.author = author
+        self.quote = quote
+
+
+class User(UserMixing,db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer,primary_key = True)
@@ -17,6 +31,7 @@ class User(db.Model):
     bio = db.Column(db.String(255))
     profile_pic_path = db.Column(db.String())
     password_hash = db.Column(db.String(255))
+    blog = db.relationship('Blog',backref = 'user',lazy = "dynamic")
 
 
     @property
@@ -35,6 +50,33 @@ class User(db.Model):
 
     def __repr__(self):
         return f'User {self.username}'
+
+
+class Blog(db.Model):
+    '''
+    Blog class to define Blog Objects
+    '''
+    __tablename__ = 'blog'
+
+    id = db.Column(db.Integer,primary_key = True)
+    blog = db.Column(db.String)
+    title = db.Column(db.String)
+    date = db.Column(db.DateTime,default=datetime.utcnow)
+    user_id = db.Column(db.Integer,db.ForeignKey("users.id"))
+
+    def save_blog(self):
+        '''
+        Function that saves blogs
+        '''
+        db.session.add(self)
+        db.session.commit()
+    
+    @classmethod
+    def get_all_blogs(cls):
+        '''
+        Function that queries the database and returns all the blogs
+        '''
+        return Blog.query.all()
 
 
 class Role(db.Model):

@@ -1,10 +1,51 @@
 from flask import render_template,redirect,url_for,abort
-from ..models import User
+from ..models import User,Blog
 from flask_login import login_required
-from .forms import UpdateProfile
+from ..requests import get_quotes
+from .forms import UpdateProfile,BlogForm
 from .. import db,photos
 from app.main import main
 from wtforms import ValidationError
+
+
+@main.route('/')
+def index():
+    '''
+    View root page function that returns the index page and its data
+    '''
+    title = 'Welcome to is Own your blog'
+
+    
+    blogs= Blog.get_all_blogs() 
+    quotes = get_quotes() 
+
+    return render_template('index.html', title = title, quotes = quotes, blogs= blogs)
+
+@main.route('/all')
+def all():
+    '''
+    View root page function that returns the index page and its data
+    '''
+    title = 'Welcome to is Own your blog'
+
+    
+    blogs= Blog.get_all_blogs() 
+    
+
+    return render_template('index.html', title = title, blogs= blogs)
+
+@main.route('/blog/<int:blog_id>')
+def blog(blog_id):
+
+    '''
+    View blog page function that returns the blog details page and its data
+    '''
+    found_blog= Blog.query.get(blog_id)
+    title = blog_id
+    # blog_comments = Comment.get_comments(blog_id)
+
+    return render_template('blog.html',title= title ,found_blog= found_blog)
+
 
 @main.route('/user/<uname>/update',methods = ['GET','POST'])
 @login_required
@@ -36,3 +77,4 @@ def update_pic(uname):
         user.profile_pic_path = path
         db.session.commit()
     return redirect(url_for('main.profile',uname=uname))
+
