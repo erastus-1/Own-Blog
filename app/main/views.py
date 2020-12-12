@@ -47,6 +47,25 @@ def blog(blog_id):
     return render_template('blog.html',title= title ,found_blog= found_blog)
 
 
+
+@main.route("/blog/<int:blog_id>/update", methods=['GET', 'POST'])
+def update_post(blog_id):
+    blog = Blog.query.get_or_404(blog_id)
+    if blog.user != current_user:
+        abort(403)
+    form = BlogForm()
+    if form.validate_on_submit():
+        blog.title = form.title.data
+        blog.content = form.content.data
+        
+        db.session.commit()
+        flash('Your post has been updated!', 'success')
+        return redirect(url_for('main.blog', blog_id=blog.id))
+    elif request.method == 'GET':
+        blog.title.data = blog.title
+        blog.content.data = blog.content
+    return render_template('blog.html', title='Update Blog', form=form)
+
 @main.route('/user/<uname>/update',methods = ['GET','POST'])
 @login_required
 def update_profile(uname):

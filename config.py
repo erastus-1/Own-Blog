@@ -5,6 +5,7 @@ class Config:
     SECRET_KEY = os.environ.get('mutwech')
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://erastus:Angular2020@localhost/blog'
     UPLOADED_PHOTOS_DEST ='app/static/photos'
+    QUOTE_API_BASE_URL ='http://quotes.stormconsultancy.co.uk/random.json'
 
     #  email configurations
     MAIL_SERVER = 'smtp.gmail.com'

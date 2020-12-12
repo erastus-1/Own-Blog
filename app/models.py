@@ -1,6 +1,6 @@
 from . import db
 from werkzeug.security import generate_password_hash,check_password_hash
-from flask_login import UserMixing, current_user
+from flask_login import UserMixin, current_user
 from . import login_manager
 from datetime import datetime
 
@@ -21,7 +21,7 @@ class Quote:
         self.quote = quote
 
 
-class User(UserMixing,db.Model):
+class User(UserMixin,db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer,primary_key = True)

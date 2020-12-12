@@ -1,7 +1,6 @@
 from .models import Quote
 import requests
  
- 
 base_url = None
 
 def configure_request(app):
