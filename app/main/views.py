@@ -3,7 +3,8 @@ from ..models import User
 from flask_login import login_required
 from .forms import UpdateProfile
 from .. import db,photos
-
+from app.main import main
+from wtforms import ValidationError
 
 @main.route('/user/<uname>/update',methods = ['GET','POST'])
 @login_required
