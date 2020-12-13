@@ -1,70 +1,25 @@
-from flask import render_template,redirect,url_for,abort
-from ..models import User,Blog
-from flask_login import login_required
+from flask import render_template,redirect,url_for,abort,request,flash
+from ..models import User,Blog,Subscribe,ProfilePhoto,Comment
+from flask_login import login_required,current_user
 from ..requests import get_quotes
-from .forms import UpdateProfile,BlogForm
+from .forms import UpdateProfile,BlogForm,CommentForm
 from .. import db,photos
 from app.main import main
 from wtforms import ValidationError
-
-
-@main.route('/')
-def index():
-    '''
-    View root page function that returns the index page and its data
-    '''
-    title = 'Welcome to is Own your blog'
-
-    
-    blogs= Blog.get_all_blogs() 
-    quotes = get_quotes() 
-
-    return render_template('index.html', title = title, quotes = quotes, blogs= blogs)
-
-@main.route('/all')
-def all():
-    '''
-    View root page function that returns the index page and its data
-    '''
-    title = 'Welcome to is Own your blog'
-
-    
-    blogs= Blog.get_all_blogs() 
-    
-
-    return render_template('index.html', title = title, blogs= blogs)
-
-@main.route('/blog/<int:blog_id>')
-def blog(blog_id):
-
-    '''
-    View blog page function that returns the blog details page and its data
-    '''
-    found_blog= Blog.query.get(blog_id)
-    title = blog_id
-    # blog_comments = Comment.get_comments(blog_id)
-
-    return render_template('blog.html',title= title ,found_blog= found_blog)
+import markdown2
 
 
 
-@main.route("/blog/<int:blog_id>/update", methods=['GET', 'POST'])
-def update_post(blog_id):
-    blog = Blog.query.get_or_404(blog_id)
-    if blog.user != current_user:
-        abort(403)
-    form = BlogForm()
-    if form.validate_on_submit():
-        blog.title = form.title.data
-        blog.content = form.content.data
-        
-        db.session.commit()
-        flash('Your post has been updated!', 'success')
-        return redirect(url_for('main.blog', blog_id=blog.id))
-    elif request.method == 'GET':
-        blog.title.data = blog.title
-        blog.content.data = blog.content
-    return render_template('blog.html', title='Update Blog', form=form)
+@main.route('/user/<uname>')
+@login_required
+def profile(uname):
+    user = User.query.filter_by(username = uname).first()
+
+    if user is None:
+        abort(404)
+
+    return render_template("profile/profile.html", user = user)
+
 
 @main.route('/user/<uname>/update',methods = ['GET','POST'])
 @login_required
@@ -90,10 +45,135 @@ def update_profile(uname):
 @login_required
 def update_pic(uname):
     user = User.query.filter_by(username = uname).first()
+
     if 'photo' in request.files:
         filename = photos.save(request.files['photo'])
         path = f'photos/{filename}'
         user.profile_pic_path = path
         db.session.commit()
     return redirect(url_for('main.profile',uname=uname))
+
+
+@main.route('/')
+def index():
+    '''
+    View root page function that returns the index page and its data
+    '''
+    title = 'Welcome to Own your blog'
+
+    quotes = get_quotes() 
+    return render_template('index.html', title = title, quotes = quotes)
+
+
+
+@main.route('/blog/new', methods=['GET','POST'])
+@login_required
+def blog():
+    """
+    View blog function that returns the blog page and data
+    """
+    blog_form = BlogForm()
+    if blog_form.validate_on_submit():
+        title = blog_form.data
+        description = blog_form.description.data
+        new_blog = Blog(title=title, description=description, author=current_user)
+
+        db.session.add(new_blog)
+        db.session.commit()
+        return redirect(url_for('main.blogs'))
+
+    title = 'New Blog'
+    return render_template('blog.html', title=title, blog_form=blog_form)
+
+
+@main.route('/blogs/all', methods= ['GET','POST'])
+@login_required
+def blogs_all():
+    '''
+    View root page function that returns the index page and its data
+    '''
+
+    title = 'Welcome to is Own your blog'    
+    blogs= Blog.query.all() 
+    quote = get_quotes()
+    
+    return render_template('blogs.html', title = title, blogs= blogs, quote=quote)
+
+@main.route('/view/<int:id>', methods=['GET','POST'])
+def view(id):
+
+    '''
+    View blog page function that returns the blog details page and its data
+    '''
+    blog = Blog.query.get_or_404(id)
+    blog_comments = Comment.query.filter_by(blog_id=id).all()
+    comment_form = CommentForm
+
+    if comment_form.validate_on_submit():
+        new_comment = Comment(blog_id=id, comment=comment_form.comment.data, authour=current_user)
+        new_comment.save_comment()
+
+    return render_template('view.html',blog=blog, blog_comments=blog_comments, comment_form=comment_form)
+
+
+
+@main.route('/comment/<int:id>', methods=['GET','POST'])
+@login_required
+def comment(id):
+    comment_form = CommentForm()
+    if comment_form.validate_on_submit():
+        new_comment = Comment(blog_id=id, comment=comment.form.data, author=current_user)
+        new_comment.save_comment()
+
+    return render_template('view.html', comment_form=comment_form)
+
+
+@main.route('/Update/<int:id>', methods=['GET','POST'])
+@login_required
+def update_blog(id):
+    blog = Blog.query.get_or_404(id)
+    if blog.author != current_user:
+        abort(403)
+    form = BlogForm()
+
+    if form.validate_on_submit():
+        blog.blog_title = form.blog_title.data
+        blog.description = form.description.data
+        db.session.commit()
+
+        flash('Your post has been Updated', 'successfully')
+        return redirect(url_for('main.blogs'))
+
+    elif request.method == 'GET':
+        form.blog_title.data = blog.post_title
+        form.description.data = blog.description
+
+    return render_template('update_blog.html', form=form)
+
+
+@main.route('/delete/<int:id>', methods=['GET','POST'])
+@login_required
+def delete(id):
+    blog = Blog.query.get_or_404(id)
+    if blog.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+
+    flash('Your post has been deleted', 'successfully')
+    return redirect(url_for('main.blogs'))
+
+
+@main.route('/subscribe', methods=['GET','POST'])
+def subscribe():
+    '''
+    Function to send email upon subscription
+    '''
+    if request.method == 'POST':
+        email = request.form['email']
+        new_email = Subscribe(email=email)
+        db.session.add(new_email)
+        db.session.commit()
+        flash('Thank you for your subscription')
+        return redirect(url_for('main.index'))
 
