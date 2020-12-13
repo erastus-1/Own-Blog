@@ -1,12 +1,12 @@
-{% macro displayQuoteList(quote_list) %}
+{% macro displayBlogs(blogs) %}
 
 
 <div class="row">
-    {% for quote in quote_list %}
+    {% for blog in blogs %}
     <div class="row">
         <blockquote class="blockquote text-center">
-            <p class="mb-0">{{quote.quote}}</p>
-            <footer class="blockquote-footer"><cite>{{quote.author}}</cite></footer>
+            <p class="mb-0">{{blog.blog}}</p>
+            <footer class="blockquote-footer"><cite>Posted on : {{blog.date}}</cite></footer>
         </blockquote>
     </div>
 </div>
