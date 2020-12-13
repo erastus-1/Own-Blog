@@ -65,27 +65,6 @@ def index():
     return render_template('index.html', title = title, quotes = quotes)
 
 
-
-@main.route('/blog/new', methods=['GET','POST'])
-@login_required
-def blog():
-    """
-    View blog function that returns the blog page and data
-    """
-    blog_form = BlogForm()
-    if blog_form.validate_on_submit():
-        title = blog_form.data
-        description = blog_form.description.data
-        new_blog = Blog(title=title, description=description, author=current_user)
-
-        db.session.add(new_blog)
-        db.session.commit()
-        return redirect(url_for('main.blogs'))
-
-    title = 'New Blog'
-    return render_template('blog.html', title=title, blog_form=blog_form)
-
-
 @main.route('/blogs/all', methods= ['GET','POST'])
 @login_required
 def blogs_all():
@@ -95,9 +74,30 @@ def blogs_all():
 
     title = 'Welcome to is Own your blog'    
     blogs= Blog.query.all() 
-    quote = get_quotes()
+    quotes = get_quotes()
     
-    return render_template('blogs.html', title = title, blogs= blogs, quote=quote)
+    return render_template('blogs.html', title = title, blogs= blogs, quotes=quotes)
+
+
+@main.route('/blog/new', methods=['GET','POST'])
+@login_required
+def blog():
+    """
+    View blog function that returns the blog page and data
+    """
+    blog_form = BlogForm()
+    if blog_form.validate_on_submit():
+        title = blog_form.title.data
+        description = blog_form.description.data
+        new_blog = Blog(title=title, description=description, author=current_user)
+
+        db.session.add(new_blog)
+        db.session.commit()
+        return redirect(url_for('main.blog'))
+
+    title = 'New Blog'
+    return render_template('blog.html', title=title, blog_form=blog_form)
+
 
 @main.route('/view/<int:id>', methods=['GET','POST'])
 def view(id):
@@ -107,23 +107,23 @@ def view(id):
     '''
     blog = Blog.query.get_or_404(id)
     blog_comments = Comment.query.filter_by(blog_id=id).all()
-    comment_form = CommentForm
+    comment_form = CommentForm()
 
     if comment_form.validate_on_submit():
-        new_comment = Comment(blog_id=id, comment=comment_form.comment.data, authour=current_user)
-        new_comment.save_comment()
+       new_comment = Comment(blog_id=id, comment=comment_form.comment.data, author=current_user)
+       new_comment.save_comment()
 
     return render_template('view.html',blog=blog, blog_comments=blog_comments, comment_form=comment_form)
 
 
-
 @main.route('/comment/<int:id>', methods=['GET','POST'])
 @login_required
-def comment(id):
+def comment(blog_id):
     comment_form = CommentForm()
     if comment_form.validate_on_submit():
-        new_comment = Comment(blog_id=id, comment=comment.form.data, author=current_user)
+        new_comment = Comment(blog_id=id, comment=comment.form.data, author=current_user.username)
         new_comment.save_comment()
+        return redirect(url_for('main.blog'))
 
     return render_template('view.html', comment_form=comment_form)
 
@@ -142,10 +142,10 @@ def update_blog(id):
         db.session.commit()
 
         flash('Your post has been Updated', 'successfully')
-        return redirect(url_for('main.blogs'))
+        return redirect(url_for('main.blog'))
 
     elif request.method == 'GET':
-        form.blog_title.data = blog.post_title
+        form.title.data = blog.title
         form.description.data = blog.description
 
     return render_template('update_blog.html', form=form)
@@ -157,11 +157,11 @@ def delete(id):
     blog = Blog.query.get_or_404(id)
     if blog.author != current_user:
         abort(403)
-    db.session.delete(post)
+    db.session.delete(blog)
     db.session.commit()
 
     flash('Your post has been deleted', 'successfully')
-    return redirect(url_for('main.blogs'))
+    return redirect(url_for('main.blog'))
 
 
 @main.route('/subscribe', methods=['GET','POST'])
