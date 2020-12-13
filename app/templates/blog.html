@@ -1,7 +1,22 @@
 {% extends 'base.html'%}
 {% import 'macros.html' as macro%}
+{% import "bootstrap/wtf.html" as wtf %}
 
 
-{% block content%}
+{% block content %}
+<div class="container-fluid" id="post-banner" style="background-color:darkgray;">
+    <h2 style="font-weight: 900; font-size: 30px; color: white;" class="text-center">Latest Blogs</h2>
+    <p class="text-center" style="font-size: 20px;"><small>Add your Blog here..</small></p>
 
-{% endblock%}
+    <div class="container pt-2">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8 pt-3">
+                {{ wtf.quick_form(blog_form)}}
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
