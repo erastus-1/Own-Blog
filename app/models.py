@@ -9,6 +9,12 @@ from datetime import datetime
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+class ProfilePhoto(db.Model):
+    __tablename__ = 'profile_photos'
+
+    id = db.Column(db.Integer,primary_key = True)
+    pic_path = db.Column(db.String())
+    user_id = db.Column(db.Integer,db.ForeignKey("users.id"))
 
 class Quote:
     '''
@@ -20,18 +26,19 @@ class Quote:
         self.author = author
         self.quote = quote
 
-
 class User(UserMixin,db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer,primary_key = True)
-    username = db.Column(db.String(255),index = True)
+    username = db.Column(db.String(255))
     email = db.Column(db.String(255),unique = True,index = True)
     role_id = db.Column(db.Integer,db.ForeignKey('roles.id'))
     bio = db.Column(db.String(255))
     profile_pic_path = db.Column(db.String())
-    password_hash = db.Column(db.String(255))
-    blog = db.relationship('Blog',backref = 'user',lazy = "dynamic")
+    pass_secure = db.Column(db.String(255))
+    photos = db.relationship('ProfilePhoto', backref = 'user', lazy = "dynamic")
+    blog = db.relationship('Blog',backref = 'author',lazy = True)
+    comments = db.relationship('Comment', backref='author', lazy=True)
 
 
     @property
@@ -47,7 +54,6 @@ class User(UserMixin,db.Model):
         return check_password_hash(self.pass_secure,password)
     
 
-
     def __repr__(self):
         return f'User {self.username}'
 
@@ -59,10 +65,11 @@ class Blog(db.Model):
     __tablename__ = 'blog'
 
     id = db.Column(db.Integer,primary_key = True)
-    blog = db.Column(db.String)
-    title = db.Column(db.String)
+    title = db.Column(db.String(255), index = True)
+    description = db.Column(db.String(255),index = True)
     date = db.Column(db.DateTime,default=datetime.utcnow)
-    user_id = db.Column(db.Integer,db.ForeignKey("users.id"))
+    user_id = db.Column(db.Integer,db.ForeignKey("users.id"),nullable=False)
+    blog = db.relationship('Comment', backref='blog', passive_deletes=True)
 
     def save_blog(self):
         '''
@@ -72,11 +79,38 @@ class Blog(db.Model):
         db.session.commit()
     
     @classmethod
-    def get_all_blogs(cls):
+    def get_all_blogs(cls, id):
         '''
         Function that queries the database and returns all the blogs
         '''
-        return Blog.query.all()
+        blogs = Blog.query.filter_by(id=id).all()
+        return Blogs
+
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    comment = db.Column(db.Text())
+    blog_id = db.Column(db.Integer, db.ForeignKey('blog.id', ondelete="CASCADE"))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def save_comment(self):
+        db.session.add(self)
+        db.session.commit()
+        
+    @classmethod
+    def get_comments(cls, blog_id):
+        comments = Comment.query.filter_by(post_id=blog_id).all()
+        return comments
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        
+    def __repr__(self):
+        return f'Comments: {self.comment}'
 
 
 class Role(db.Model):
@@ -89,3 +123,10 @@ class Role(db.Model):
 
     def __repr__(self):
         return f'User {self.name}'
+
+class Subscribe(db.Model):
+    __tablename__ = 'subscribers'
+    id = db.Column(db.Integer, primary_key = True)
+    email = db.Column(db.String(50))
+    
+
