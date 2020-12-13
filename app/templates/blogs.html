@@ -1,0 +1,32 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<div class="container" style="background: dimgray; padding-top: 0%; padding-bottom: 0%;">
+<div class="container-fluid" style="background-color: dimgray;">
+    <div class="row">
+        <div class="col-md-4">
+            {% for blog in blogs %}
+            <h2 style="font-size: 20px; color: white; font-family: Georgia, 'Times New Roman', Times, serif; ">{{ blog.blog_title }}</h2>
+            <p style="font-size: 20px;">{{ blog.description}}</p>
+            <h6  style="font-size: 20px;" class="author_name">Posted by {{blog.author.username}}</h6>
+            <p style="font-size: 20px;" class="date">Posted on - {{blog.date.strftime('%Y-%m-%d')}}</p>
+            <a style="font-size: 20px;" href="{{ url_for('main.view', id=blog.id) }}" class="btn btn-sm btn-danger"> <i class="fa fa-eye"></i> View
+                more</a>
+            <a style="font-size: 20px;" href="{{ url_for('main.view', id=blog.id) }}" class="btn btn-sm btn-info"><i
+                    class="fa fa-comment"></i> Comment</a>
+            {% endfor %}
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <h2 style="color: white;">{{ quote.author}}</h2>
+                <hr>
+                <h2 style="font-family: 'Special Elite', cursive;
+                ">{{quote.quote}}</h2>
+                <a style="font-size:20px; color: dodgerblue; font-size: 25px;" href="{{quote.permalink}}" target="_blank">for more quotes..</a>
+            </div>
+                       
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
