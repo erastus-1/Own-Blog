@@ -3,7 +3,6 @@ import os
 class Config:
 
     SECRET_KEY='mutwech'
-    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://erastus:Angular2020@localhost/blog'
     UPLOADED_PHOTOS_DEST ='app/static/photos'
     QUOTE_API_BASE_URL ='http://quotes.stormconsultancy.co.uk/random.json'
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
@@ -29,9 +28,6 @@ class TestConfig(Config):
 
 
 class DevConfig(Config):
-    # SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
-
-    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://erastus:Angular2020@localhost/blog'
     DEBUG = True
 
 
