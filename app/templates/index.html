@@ -12,8 +12,8 @@
 
 {% block content%}
 
-<div class="container-fluid" style="background-color: dimgray;">
-        <h2 style="color: brown;text-align: center; padding-top: 30px;font-weight: 900; padding-bottom: 30px;">WELCOME TO OWN BLOG</h2>                 
+<div class="container-fluid" style="background-color: coral;">
+        <h2 style="color: white;text-align: center; padding-top: 30px;font-weight: 900; padding-bottom: 30px;">WELCOME TO OWN BLOG</h2>                 
         <hr>
         {% if current_user.is_anonymous%}
 
@@ -26,7 +26,7 @@
                     <div class="card-header">
                         <h2 style="color: white; text-align: center;">Quote of the day...</h2>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="color: black;">
                         <blockquote class="blockquote text-center">
                             <p class="mb-0">{{quotes.quote}}</p>
                             <footer style="color: black;" class="blockquote-footer"><cite>{{quotes.author}}</cite>
