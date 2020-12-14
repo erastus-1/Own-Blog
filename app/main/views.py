@@ -137,7 +137,7 @@ def update_blog(id):
     form = BlogForm()
 
     if form.validate_on_submit():
-        blog.blog_title = form.blog_title.data
+        blog.blog.title = form.blog.title.data
         blog.description = form.description.data
         db.session.commit()
 

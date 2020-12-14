@@ -5,7 +5,7 @@
 {{ super() }}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 <link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&display=swap" rel="stylesheet">
+<link href='https://fonts.googleapis.com/css?family=Carter+One&display=swap' rel="stylesheet">
 {% endblock %}
 
 {% block content%}
@@ -33,10 +33,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg- col-md-3 mx- tex-center">
+            <div class="col-lg- col-md-3 mx- tex-center" style="width: 300px;">
                 {% for blog in blogs %}
                 <div class="post-preview text-center">
-                    <a href="{{ url_for('main.blog', blog_id=blog.id)}}">
+                    <a href="{{ url_for('main.blog_all', blog_id=blog.id)}}">
                         <h2 class="blog-title">
                             {{blog.title}}
                         </h2>
