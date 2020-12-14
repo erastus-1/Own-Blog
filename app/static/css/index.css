@@ -2,7 +2,7 @@
 
 
 body {
-       background:linear-gradient(to top, darkgrey 0%, #dc5038 97%);  
+       background:linear-gradient(to top, darkgrey 0%, darkgrey 97%);  
      }
 
 .button:hover {background-color:white}
