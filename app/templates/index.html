@@ -11,16 +11,12 @@
 {% block content%}
 
 <div class="container-fluid" style="background-color: dimgray;">
-    <div class="row">
-        <h2 style="color: brown;text-align: center; padding-top: 30px;
-                 font-weight: 900;">WELCOME TO OWN BLOG</h2>
+        <h2 style="color: brown;text-align: center; padding-top: 30px;font-weight: 900; padding-bottom: 30px;">WELCOME TO OWN BLOG</h2>                 
         <hr>
         {% if current_user.is_anonymous%}
 
         {%endif%}
         </ul>
-    </div>
-
     <div class="container-fluid" style="padding-top:120px ; padding-left: 50px;">
         <div class="row">
             <div class="col-md-6">
@@ -80,9 +76,10 @@
         <div class="div" style="padding-top:10px ;">
             <p
                 style="font-size: 20px; color: black; text-align: center;font-family: 'Bangers', cursive; font-style: italic;">
-                Designed by Mtafix Entertainment, <br>copyright
+                Designed by Mtafix Studios, <br>copyright
                 Ruiru,Erastus
             </p>
         </div>
+    </div>
     </div>
     {% endblock %}
